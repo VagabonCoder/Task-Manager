@@ -1,0 +1,137 @@
+using System;
+using System.Collections.Generic;
+
+namespace TaskManagerApp
+{
+    // Define the structure of a Task object
+    public class TaskItem
+    {
+        public int Id { get; set; }
+        public string Title { get; set; } = string.Empty;
+        public bool IsCompleted { get; set; } = false;
+    }
+
+    class Program
+    {
+        // Global storage for tasks and ID counter
+        private static List<TaskItem> tasks = new List<TaskItem>();
+        private static int nextId = 1;
+
+        static void Main(string[] args)
+        {
+            bool running = true;
+            while (running)
+            {
+                DisplayMenu();
+                string? choice = Console.ReadLine();
+                Console.Clear();
+
+                switch (choice)
+                {
+                    case "1": AddTask(); break;
+                    case "2": ViewTasks(); break;
+                    case "3": CompleteTask(); break;
+                    case "4": DeleteTask(); break;
+                    case "5": running = false; break;
+                    default: Console.WriteLine("Invalid option. Please try again."); break;
+                }
+                Console.WriteLine("\nPress any key to return to the menu...");
+                Console.ReadKey();
+                Console.Clear();
+            }
+        }
+
+        private static void DisplayMenu()
+        {
+            Console.WriteLine("=== C# TASK MANAGER ===");
+            Console.WriteLine("1. Add Task");
+            Console.WriteLine("2. View Tasks");
+            Console.WriteLine("3. Mark Task as Completed");
+            Console.WriteLine("4. Delete Task");
+            Console.WriteLine("5. Exit");
+            Console.Write("\nChoose an option: ");
+        }
+
+        private static void AddTask()
+        {
+            Console.Write("Enter task title: ");
+            string? title = Console.ReadLine();
+
+            if (string.IsNullOrWhiteSpace(title))
+            {
+                Console.WriteLine("Task title cannot be empty!");
+                return;
+            }
+
+            tasks.Add(new TaskItem { Id = nextId++, Title = title });
+            Console.WriteLine("Task added successfully!");
+        }
+
+        private static void ViewTasks()
+        {
+            if (tasks.Count == 0)
+            {
+                Console.WriteLine("No tasks found.");
+                return;
+            }
+
+            Console.WriteLine("ID  | Status     | Title");
+            Console.WriteLine("---------------------------------");
+            foreach (var task in tasks)
+            {
+                string status = task.IsCompleted ? "[X] Done" : "[ ] Pending";
+                Console.WriteLine($"{task.Id,-3} | {status,-10} | {task.Title}");
+            }
+        }
+
+        private static void CompleteTask()
+        {
+            ViewTasks();
+            if (tasks.Count == 0) return;
+
+            Console.Write("\nEnter the ID of the task to mark as complete: ");
+            if (int.TryParse(Console.ReadLine(), out int id))
+            {
+                var task = tasks.Find(t => t.Id == id);
+                if (task != null)
+                {
+                    task.IsCompleted = true;
+                    Console.WriteLine($"Task '{task.Title}' marked as complete!");
+                }
+                else
+                {
+                    Console.WriteLine("Task ID not found.");
+                }
+            }
+            else
+            {
+                Console.WriteLine("Invalid input. Please enter a valid number.");
+            }
+        }
+
+        private static void DeleteTask()
+        {
+            ViewTasks();
+            if (tasks.Count == 0) return;
+
+            Console.Write("\nEnter the ID of the task to delete: ");
+            if (int.TryParse(Console.ReadLine(), out int id))
+            {
+                var task = tasks.Find(t => t.Id == id);
+                if (task != null)
+                {
+                    tasks.Remove(task);
+                    Console.WriteLine($"Task '{task.Title}' deleted successfully!");
+                }
+                else
+                {
+                    Console.WriteLine("Task ID not found.");
+                }
+            }
+            else
+            {
+                Console.WriteLine("Invalid input. Please enter a valid number.");
+            }
+        }
+    }
+}
